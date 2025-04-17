@@ -10,23 +10,23 @@ const PORT = 5000;
 app.use(express.json());
 
 // Configuração segura de CORS
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://area-cliente.opengestao.com.br'
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Permite chamadas sem origin (ex: ferramentas internas) ou com origem permitida
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn(`❌ Origin não permitida: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 
 // Variáveis do Supabase
 const SUPABASE_URL = process.env.SUPABASE_URL;
